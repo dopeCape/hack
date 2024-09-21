@@ -1,5 +1,6 @@
 CREATE TABLE `medical_data` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`userId` text,
 	`age` integer NOT NULL,
 	`gender` text NOT NULL,
 	`ethnicity` text,
@@ -26,5 +27,12 @@ CREATE TABLE `medical_data` (
 	`mood` text,
 	`stress_level` integer NOT NULL,
 	`genomic_data` text,
-	`family_history` text
+	`family_history` text,
+	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE TABLE `users` (
+	`id` text PRIMARY KEY NOT NULL,
+	`name` text,
+	`email` text
 );

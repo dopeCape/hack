@@ -1,9 +1,9 @@
-import { sql } from "drizzle-orm";
 import { text, integer, sqliteTable, real } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: text("id").primaryKey(),
   name: text("name"),
+  email: text("email"),
 });
 
 // Users table schema
@@ -11,6 +11,7 @@ export const users = sqliteTable("users", {
 // Medical Data table schema
 export const medicalData = sqliteTable("medical_data", {
   id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("userId").references(() => users.id),
 
   // Demographic Data
   age: integer("age").notNull(),
