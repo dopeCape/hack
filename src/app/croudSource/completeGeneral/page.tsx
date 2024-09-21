@@ -1,5 +1,6 @@
 "use client";
 
+import { auth } from "@clerk/nextjs/server";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,10 +79,14 @@ export default function MedicalDataForm() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-    // Here you would typically send the data to your backend
+    const res = await fetch("/api/generalData", {
+      method: "POST",
+      body: JSON.stringify(formData),
+    });
+    const data = await res.json();
+    console.log(data);
   };
 
   return (

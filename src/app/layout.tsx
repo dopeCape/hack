@@ -19,7 +19,19 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body>{children}</body>
+        <body>
+          {!navBarSkipList.includes(pathName) && (
+            <>
+              <SignedOut>
+                <SignInButton />
+              </SignedOut>
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
+            </>
+          )}
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   );
