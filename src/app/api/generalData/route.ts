@@ -1,6 +1,6 @@
 import db from "@/db";
 import { medicalData } from "@/db/schema";
-export default async function POST(req: Request) {
+export  async function POST(req: Request) {
   try {
     type genericType = typeof medicalData.$inferInsert;
     const genericData = (await req.json()) as genericType;

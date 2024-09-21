@@ -73,9 +73,16 @@ export default function MedicalDataForm() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit =async (e) => {
     e.preventDefault()
-    console.log(formData)
+    const res = await fetch('/api/generalData',{
+      method:'POST',
+      body:JSON.stringify(formData)
+    })
+    const data = await res.json()
+    console.log(data);
+     
+    
     // Here you would typically send the data to your backend
   }
 
