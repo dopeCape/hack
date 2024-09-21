@@ -14,42 +14,89 @@ export async function GET() {
     },
   });
 
-  // StressLevel Data Grouping
-  const stressLevelData = healthData.map((item) => ({
-    ageGroup: getAgeGroup(item.age), // Utility function to group age ranges
-    stressLevel: item.stressLevel,
+  // Utility function to group by age
+  function getAgeGroup(age: number): string {
+    if (age >= 18 && age <= 24) return "18-24";
+    if (age >= 25 && age <= 34) return "25-34";
+    if (age >= 35 && age <= 44) return "35-44";
+    if (age >= 45 && age <= 54) return "45-54";
+    if (age >= 55 && age <= 64) return "55-64";
+    return "65+";
+  }
+
+  // Group health data by age group
+  const groupedData: Record<string, any[]> = {};
+
+  healthData.forEach((item) => {
+    const ageGroup = getAgeGroup(item.age);
+    if (!groupedData[ageGroup]) {
+      groupedData[ageGroup] = [];
+    }
+    groupedData[ageGroup].push(item);
+  });
+
+  // Function to calculate averages
+  function calculateAverages(group: any[], fields: string[]): any {
+    const totalItems = group.length;
+    const averages: Record<string, number> = {};
+
+    fields.forEach((field) => {
+      averages[field] =
+        group.reduce((sum, item) => sum + (item[field] || 0), 0) / totalItems;
+    });
+
+    return averages;
+  }
+
+  // StressLevel Data Averaging
+  const stressLevelData = Object.keys(groupedData).map((ageGroup) => ({
+    ageGroup,
+    stressLevel: calculateAverages(groupedData[ageGroup], ["stressLevel"])
+      .stressLevel,
   }));
 
-  // BloodPressure Data Grouping
-  const bloodPressureData = healthData.map((item) => {
-    const bp = item.bloodPressure?.split("/") as string[];
+  // BloodPressure Data Averaging
+  const bloodPressureData = Object.keys(groupedData).map((ageGroup) => {
+    const systolic =
+      groupedData[ageGroup].reduce((sum, item) => {
+        const bp = item.bloodPressure?.split("/") as string[];
+        return sum + (parseInt(bp?.[0], 10) || 0);
+      }, 0) / groupedData[ageGroup].length;
+
+    const diastolic =
+      groupedData[ageGroup].reduce((sum, item) => {
+        const bp = item.bloodPressure?.split("/") as string[];
+        return sum + (parseInt(bp?.[1], 10) || 0);
+      }, 0) / groupedData[ageGroup].length;
+
     return {
-      age: getAgeGroup(item.age), // Utility function to group age ranges
-      systolic: bp[0],
-      diastolic: bp[1],
+      ageGroup,
+      systolic,
+      diastolic,
     };
   });
 
-  // HeartRate Data Grouping
+  // Blood Glucose and Cholesterol Averaging
+  const bloodLevelsByAge = Object.keys(groupedData).map((ageGroup) => ({
+    ageGroup,
+    bloodGlucose: calculateAverages(groupedData[ageGroup], ["bloodGlucose"])
+      .bloodGlucose,
+    cholesterol: calculateAverages(groupedData[ageGroup], ["cholesterol"])
+      .cholesterol,
+  }));
+
+  // HeartRate Data Grouping (unchanged)
   const heartRateData = healthData.map((item) => ({
     age: item.age,
     heartRate: item.heartRate,
   }));
 
-  // RespiratoryRate and Temperature Grouping
+  // RespiratoryRate and Temperature Grouping (unchanged)
   const respiratoryAndTemperatureData = healthData.map((item, index) => ({
     id: index + 1,
     respiratoryRate: item.respiratoryRate,
     temperature: item.temperature,
   }));
-
-  const bloodLevelsByAge = healthData.map((item) => {
-    return {
-      age: getAgeGroup(item.age),
-      bloodGlucose: item.bloodGlucose,
-      cholesterol: item.cholesterol,
-    };
-  });
 
   const big_data = {
     stressLevelData,
@@ -58,16 +105,6 @@ export async function GET() {
     respiratoryAndTemperatureData,
     bloodLevelsByAge,
   };
+
   return Response.json(big_data, { status: 200 });
-
-  // Utility function to group age into ranges
-}
-
-function getAgeGroup(age: number): string {
-  if (age >= 18 && age <= 24) return "18-24";
-  if (age >= 25 && age <= 34) return "25-34";
-  if (age >= 35 && age <= 44) return "35-44";
-  if (age >= 45 && age <= 54) return "45-54";
-  if (age >= 55 && age <= 64) return "55-64";
-  return "65+";
 }
