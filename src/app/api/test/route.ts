@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { currentUser, auth } from "@clerk/nextjs/server";
 import db from "@/db";
 
