@@ -1,0 +1,17 @@
+auth, next auth or clerk 
+shadcn -- done
+realtime
+mongo db --
+sql
+redis
+vectordb
+langchain
+openai
+middleware, error, response, auth, protected routes.
+services for cache, langchain, and realtime ,   
+context with zoostand
+providers for realtime etc. 
+basic pages, generic landing page, usefull util func, usefull db actions, usefull 
+
+
+
